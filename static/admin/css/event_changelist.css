@@ -1,0 +1,83 @@
+@media (max-width: 700px) {
+  body.app-events.model-event.change-list #changelist .results {
+    overflow: visible;
+  }
+
+  body.app-events.model-event.change-list #result_list {
+    background: transparent;
+    border: 0;
+    display: block;
+    width: 100%;
+  }
+
+  body.app-events.model-event.change-list #result_list thead {
+    display: none;
+  }
+
+  body.app-events.model-event.change-list #result_list tbody {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+  }
+
+  body.app-events.model-event.change-list #result_list tbody tr {
+    background: var(--body-bg, #fff);
+    border: 1px solid var(--hairline-color, #e8e8e8);
+    border-radius: 6px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: hidden;
+    padding: 8px 12px;
+    position: relative;
+  }
+
+  body.app-events.model-event.change-list #result_list tbody tr.selected {
+    background: var(--selected-row, #ffc);
+  }
+
+  body.app-events.model-event.change-list #result_list tbody tr > th,
+  body.app-events.model-event.change-list #result_list tbody tr > td {
+    align-items: start;
+    border-bottom: 1px solid var(--hairline-color, #e8e8e8);
+    box-sizing: border-box;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: minmax(96px, 34%) minmax(0, 1fr);
+    min-width: 0;
+    padding: 8px 0;
+    white-space: normal;
+    width: 100%;
+  }
+
+  body.app-events.model-event.change-list #result_list tbody tr > :last-child {
+    border-bottom: 0;
+  }
+
+  body.app-events.model-event.change-list #result_list tbody tr > [data-label]::before {
+    color: var(--body-quiet-color, #666);
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  body.app-events.model-event.change-list #result_list tbody .action-checkbox {
+    border: 0;
+    display: block;
+    inset-inline-end: 12px;
+    padding: 0;
+    position: absolute;
+    top: 13px;
+    width: auto;
+    z-index: 1;
+  }
+
+  body.app-events.model-event.change-list #result_list tbody .field-event_name {
+    padding-inline-end: 34px;
+  }
+
+  body.app-events.model-event.change-list #result_list tbody .event-public-links {
+    justify-content: flex-start;
+  }
+}

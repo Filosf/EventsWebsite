@@ -13,7 +13,7 @@ LANGUAGE_CHOICES = [
 
 TRANSLATION_FIELDS = [
     ("title", admin_text("Заголовок", "Title"), forms.TextInput),
-    ("subtitle", admin_text("Подзаголовок", "Subtitle"), forms.TextInput),
+    ("subtitle", admin_text("Подзаголовок", "Subtitle"), forms.Textarea),
     ("description", admin_text("Описание", "Description"), forms.Textarea),
     ("location_name", admin_text("Название места", "Venue name"), forms.TextInput),
     ("location_address", admin_text("Адрес", "Address"), forms.TextInput),

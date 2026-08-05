@@ -484,6 +484,8 @@ class EventMvpTests(TestCase):
         self.assertEqual(event_list.context["cl"].result_count, 1)
         self.assertNotContains(event_list, f'href="{app_index_url}"')
         self.assertContains(event_list, "Ивенты")
+        self.assertContains(event_list, "admin/css/event_changelist.css")
+        self.assertContains(event_list, "admin/js/event_changelist.js")
         self.assertContains(event_list, 'class="copy-link-button"', count=3)
         for language in ("ru", "en", "he"):
             self.assertContains(event_list, reverse("events:event_page_language", kwargs={"language": language, "slug": self.event.slug}))
@@ -496,6 +498,9 @@ class EventMvpTests(TestCase):
         self.assertContains(editor, 'id="id_ru_banner_image"')
         self.assertContains(editor, 'id="id_en_banner_image"')
         self.assertContains(editor, 'id="id_he_banner_image"')
+        self.assertContains(editor, '<textarea name="ru_subtitle"')
+        self.assertContains(editor, '<textarea name="en_subtitle"')
+        self.assertContains(editor, '<textarea name="he_subtitle"')
         self.assertContains(editor, 'id="event-preview-viewport"')
         self.assertContains(editor, 'id="event-preview-frame"')
         self.assertContains(editor, "language-panel language-ru")
