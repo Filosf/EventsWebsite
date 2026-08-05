@@ -76,6 +76,8 @@ class StaffUserChangeForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["email"].label = "Email"
         self.fields["email"].required = True
+        if "is_superuser" not in self.fields:
+            return
         self.fields["is_superuser"].label = admin_text("Администратор", "Administrator")
         self.fields["is_superuser"].help_text = admin_text(
             "Разрешает управлять другими пользователями.",

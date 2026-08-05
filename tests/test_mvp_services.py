@@ -538,6 +538,11 @@ class EventMvpTests(TestCase):
         with self.assertRaises(PermissionDenied):
             user_admin.delete_queryset(request, get_user_model().objects.filter(pk=self.administrator.pk))
 
+        own_change_page = self.client.get(reverse("admin:auth_user_change", args=[self.administrator.pk]))
+        self.assertEqual(own_change_page.status_code, 200)
+        self.assertNotContains(own_change_page, 'name="is_active"')
+        self.assertNotContains(own_change_page, 'name="is_superuser"')
+
         response = self.client.post(
             add_url,
             {
