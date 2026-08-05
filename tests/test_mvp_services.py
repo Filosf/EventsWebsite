@@ -195,14 +195,28 @@ class EventMvpTests(TestCase):
         self.assertContains(limited, "Слишком много попыток", status_code=429)
 
     def test_interface_is_localized_and_has_no_empty_attendance_choice(self):
+        ru = self.client.get(reverse("events:event_page_language", kwargs={"language": "ru", "slug": self.event.slug}))
+        self.assertContains(ru, '<select name="guest_count"')
+        ru_party_sizes = list(ru.context["form"].fields["guest_count"].widget.choices)
+        self.assertEqual(len(ru_party_sizes), self.event.max_guests + 1)
+        self.assertEqual(ru_party_sizes[0], (0, "Буду один"))
+        self.assertEqual(ru_party_sizes[1], (1, "Будем вдвоём"))
+        self.assertEqual(ru_party_sizes[4], (4, "Нас будет пятеро"))
+        self.assertEqual(ru_party_sizes[-1], (self.event.max_guests, "Нас будет 11"))
+
         en = self.client.get(reverse("events:event_page_language", kwargs={"language": "en", "slug": self.event.slug}))
         self.assertContains(en, "Will you attend?")
+        self.assertContains(en, "How many people will attend?")
+        en_party_sizes = list(en.context["form"].fields["guest_count"].widget.choices)
+        self.assertEqual(en_party_sizes[1], (1, "There will be two of us"))
         self.assertContains(en, "Submit response")
         self.assertContains(en, 'class="attendance-options"')
         self.assertNotContains(en, "---------")
         he = self.client.get(reverse("events:event_page_language", kwargs={"language": "he", "slug": self.event.slug}))
         self.assertContains(he, 'dir="rtl"')
         self.assertContains(he, "האם תגיעו?")
+        he_party_sizes = list(he.context["form"].fields["guest_count"].widget.choices)
+        self.assertEqual(he_party_sizes[0], (0, "אגיע לבד"))
 
     def test_unique_visitor_uses_stable_cookie(self):
         url = reverse("events:event_page_language", kwargs={"language": "ru", "slug": self.event.slug})

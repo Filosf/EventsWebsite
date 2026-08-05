@@ -6,7 +6,7 @@ from django.core import signing
 
 from apps.registrations.models import Registration
 
-from .i18n import interface_text
+from .i18n import interface_text, party_size_choices
 
 
 class RegistrationForm(forms.ModelForm):
@@ -38,7 +38,9 @@ class RegistrationForm(forms.ModelForm):
         self.fields["email"].required = bool(event and event.require_email)
         self.fields["phone"].required = bool(event and event.require_phone)
         max_guests = event.max_guests if event else 10
-        self.fields["guest_count"].widget.attrs.update({"min": 0, "max": max_guests})
+        self.fields["guest_count"].widget = forms.Select(
+            choices=party_size_choices(language, max_guests),
+        )
         if not self.is_bound and event:
             self.fields["form_token"].initial = signing.dumps(
                 {"event_id": event.pk, "issued_at": time.time()},
@@ -84,5 +86,5 @@ class RegistrationForm(forms.ModelForm):
         if status == Registration.Attendance.DECLINED:
             return 0
         if self.event and count > self.event.max_guests:
-            raise forms.ValidationError(self.ui["max_guests"].format(count=self.event.max_guests))
+            raise forms.ValidationError(self.ui["max_guests"].format(count=self.event.max_guests + 1))
         return count
