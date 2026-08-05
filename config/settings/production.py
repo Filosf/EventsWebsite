@@ -1,12 +1,10 @@
-from django.core.exceptions import ImproperlyConfigured
-
+from config.security import normalize_production_secret
 from config.storage import build_r2_storage
 
 from .base import *  # noqa: F403
 
 DEBUG = False
-if SECRET_KEY == "dev-only-change-me":  # noqa: F405
-    raise ImproperlyConfigured("SECRET_KEY must be set in production.")
+SECRET_KEY = normalize_production_secret(SECRET_KEY)  # noqa: F405
 
 STORAGES["staticfiles"] = {  # noqa: F405
     "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
