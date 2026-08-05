@@ -128,6 +128,30 @@
   display: none;
 }
 
+html[data-theme="dark"] .language-editor-tabs button {
+  color: #b7c8bf;
+}
+
+html[data-theme="dark"] .language-editor-tabs button:hover,
+html[data-theme="dark"] .language-editor-tabs button:focus,
+html[data-theme="dark"] .language-editor-tabs button.is-active {
+  border-bottom-color: #78c99d;
+  color: #f2f8f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="auto"] .language-editor-tabs button {
+    color: #b7c8bf;
+  }
+
+  html[data-theme="auto"] .language-editor-tabs button:hover,
+  html[data-theme="auto"] .language-editor-tabs button:focus,
+  html[data-theme="auto"] .language-editor-tabs button.is-active {
+    border-bottom-color: #78c99d;
+    color: #f2f8f5;
+  }
+}
+
 .language-settings .checkbox-row,
 .language-settings #id_enabled_languages {
   display: flex;
