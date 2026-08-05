@@ -471,9 +471,18 @@ class EventMvpTests(TestCase):
 
     def test_event_is_single_admin_object_with_language_editor(self):
         self.client.force_login(self.administrator)
+        app_index_url = reverse("admin:app_list", kwargs={"app_label": "events"})
+        app_index = self.client.get(app_index_url)
+        self.assertRedirects(
+            app_index,
+            reverse("admin:events_event_changelist"),
+            fetch_redirect_response=False,
+        )
+
         event_list = self.client.get(reverse("admin:events_event_changelist"))
         self.assertEqual(event_list.status_code, 200)
         self.assertEqual(event_list.context["cl"].result_count, 1)
+        self.assertNotContains(event_list, f'href="{app_index_url}"')
         self.assertContains(event_list, "Ивенты")
         self.assertContains(event_list, 'class="copy-link-button"', count=3)
         for language in ("ru", "en", "he"):

@@ -94,6 +94,7 @@ class EventThemeInline(RoleBasedAdminMixin, admin.StackedInline):
 class EventAdmin(RoleBasedAdminMixin, admin.ModelAdmin):
     form = EventAdminForm
     change_form_template = "admin/events/event/change_form.html"
+    change_list_template = "admin/events/event/change_list.html"
     list_display = [
         "event_name",
         "status_label",
