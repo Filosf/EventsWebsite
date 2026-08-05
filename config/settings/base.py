@@ -88,6 +88,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+AUTHENTICATION_BACKENDS = ["apps.accounts.backends.CaseInsensitiveEmailBackend"]
+
 LANGUAGE_CODE = "ru"
 LANGUAGES = [
     ("ru", "Русский"),

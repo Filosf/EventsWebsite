@@ -587,6 +587,39 @@ class EventMvpTests(TestCase):
         self.assertTrue(user.is_staff)
         self.assertFalse(user.is_superuser)
 
+        duplicate = self.client.post(
+            add_url,
+            {
+                "email": "NEW.STAFF@EXAMPLE.COM",
+                "password1": "AnotherStrongPass123!",
+                "password2": "AnotherStrongPass123!",
+                "first_name": "Duplicate",
+                "last_name": "Staff",
+            },
+        )
+        self.assertEqual(duplicate.status_code, 200)
+        self.assertIn("email", duplicate.context["adminform"].form.errors)
+        self.assertEqual(get_user_model().objects.filter(email__iexact="new.staff@example.com").count(), 1)
+
+    def test_admin_login_email_is_case_insensitive(self):
+        mixed_case_user = get_user_model().objects.create_user(
+            username="Alexandra@gmail.com",
+            email="Alexandra@gmail.com",
+            password="StrongPass123!",
+            is_staff=True,
+        )
+
+        self.assertTrue(self.client.login(username="alexandra@gmail.com", password="StrongPass123!"))
+        self.assertEqual(int(self.client.session["_auth_user_id"]), mixed_case_user.pk)
+        self.client.logout()
+
+        response = self.client.post(
+            reverse("admin:login"),
+            {"username": "ALEXANDRA@GMAIL.COM", "password": "StrongPass123!"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(int(self.client.session["_auth_user_id"]), mixed_case_user.pk)
+
     @override_settings(DEBUG=False)
     def test_demo_seed_is_blocked_outside_debug(self):
         with self.assertRaises(CommandError):

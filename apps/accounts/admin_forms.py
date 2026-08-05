@@ -123,3 +123,6 @@ class StaffUserChangeForm(forms.ModelForm):
 
 class EmailAdminAuthenticationForm(AdminAuthenticationForm):
     username = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"autofocus": True}))
+
+    def clean_username(self):
+        return User.objects.normalize_email(self.cleaned_data["username"]).strip().lower()
