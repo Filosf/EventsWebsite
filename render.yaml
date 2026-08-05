@@ -33,8 +33,6 @@ services:
         value: "True"
       - key: OBJECT_STORAGE_REQUIRED
         value: "True"
-      - key: PUBLIC_DOMAIN
-        sync: false
       - key: R2_ENDPOINT_URL
         sync: false
       - key: R2_ACCESS_KEY_ID

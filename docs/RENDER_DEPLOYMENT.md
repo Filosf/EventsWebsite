@@ -7,9 +7,12 @@ Render автоматически выполняет миграции и вып�
 
 ## 1. Подготовьте домен
 
-Нужен домен, DNS-зона которого подключена к Cloudflare. Зарезервируйте два имени:
+Собственный домен приложения необязателен: Render автоматически выдаст сервису
+адрес `*.onrender.com` и TLS-сертификат. Если позже понадобится красивый адрес,
+зарезервируйте имя вроде `events.example.com`.
 
-- `events.example.com` для приложения;
+Для production-домена файлов R2 нужна DNS-зона в Cloudflare. Зарезервируйте имя:
+
 - `media.example.com` для баннеров и других загруженных файлов.
 
 Вместо `example.com` далее используйте свой домен. Render и Cloudflare выпускают
@@ -45,7 +48,6 @@ Blueprint попросит значения переменных с `sync: false
 
 | Переменная | Значение |
 | --- | --- |
-| `PUBLIC_DOMAIN` | `events.example.com` без `https://` |
 | `R2_ENDPOINT_URL` | точный S3 endpoint из Cloudflare |
 | `R2_ACCESS_KEY_ID` | Access Key ID токена R2 |
 | `R2_SECRET_ACCESS_KEY` | Secret Access Key токена R2 |
@@ -57,6 +59,9 @@ Blueprint. Не добавляйте эти значения в GitHub и не �
 репозитории.
 
 ## 4. Подключите домен приложения
+
+Этот раздел необязателен. Стандартный адрес `*.onrender.com` уже работает через
+HTTPS. Для подключения собственного домена:
 
 1. После создания ресурсов откройте `events-website` в Render.
 2. В **Settings > Custom Domains** добавьте `events.example.com`.
