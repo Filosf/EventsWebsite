@@ -1,4 +1,6 @@
+import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 import environ
 
@@ -16,6 +18,10 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 TRUST_X_FORWARDED_FOR = env("TRUST_X_FORWARDED_FOR")
+for external_host in (os.environ.get("RENDER_EXTERNAL_HOSTNAME", ""), os.environ.get("PUBLIC_DOMAIN", "")):
+    parsed_host = urlparse(external_host if "://" in external_host else f"//{external_host}").hostname
+    if parsed_host and parsed_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(parsed_host)
 
 INSTALLED_APPS = [
     "django.forms",
@@ -25,6 +31,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "storages",
     "apps.accounts.apps.AccountsConfig",
     "apps.events.apps.EventsConfig",
     "apps.registrations",

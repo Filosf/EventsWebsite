@@ -51,6 +51,10 @@ Remove-Item Env:ADMIN_EMAIL, Env:ADMIN_PASSWORD
 
 ## Public Release
 
+For the recommended managed deployment with Render PostgreSQL, Render Key Value,
+Cloudflare R2, automatic TLS, and Git-driven releases, follow
+[`docs/RENDER_DEPLOYMENT.md`](docs/RENDER_DEPLOYMENT.md).
+
 Point the domain to the server and make ports 80 and 443 reachable. Set these
 values in `.env` before starting Compose:
 

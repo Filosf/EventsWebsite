@@ -26,9 +26,17 @@ class Command(BaseCommand):
             failures.append("SECURE_SSL_REDIRECT must be True.")
         if not settings.SESSION_COOKIE_SECURE or not settings.CSRF_COOKIE_SECURE:
             failures.append("Session and CSRF cookies must be secure.")
-        site_address = os.environ.get("SITE_ADDRESS", "")
+        site_address = (
+            os.environ.get("SITE_ADDRESS")
+            or os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+            or os.environ.get("PUBLIC_DOMAIN", "")
+        )
         if not site_address or site_address.startswith("http://") or site_address in {"localhost", "https://localhost"}:
             failures.append("SITE_ADDRESS must be the public HTTPS domain.")
+        if getattr(settings, "OBJECT_STORAGE_REQUIRED", False):
+            storage_backend = settings.STORAGES.get("default", {}).get("BACKEND")
+            if storage_backend != "storages.backends.s3.S3Storage":
+                failures.append("Cloudflare R2 must be configured as the default storage backend.")
 
         deployment_messages = checks.run_checks(include_deployment_checks=True, databases=["default"])
         failures.extend(str(message) for message in deployment_messages if message.level >= checks.WARNING)

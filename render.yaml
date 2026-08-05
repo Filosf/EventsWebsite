@@ -1,0 +1,63 @@
+services:
+  - type: web
+    name: events-website
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    branch: main
+    autoDeployTrigger: checksPass
+    healthCheckPath: /healthz/
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: >-
+      gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+      --workers 2 --threads 2 --timeout 60 --access-logfile -
+    preDeployCommand: python manage.py migrate --noinput
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: events-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: events-cache
+          property: connectionString
+      - key: SECURE_SSL_REDIRECT
+        value: "True"
+      - key: TRUST_X_FORWARDED_FOR
+        value: "True"
+      - key: OBJECT_STORAGE_REQUIRED
+        value: "True"
+      - key: PUBLIC_DOMAIN
+        sync: false
+      - key: R2_ENDPOINT_URL
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET_NAME
+        sync: false
+      - key: R2_CUSTOM_DOMAIN
+        sync: false
+
+  - type: keyvalue
+    name: events-cache
+    plan: free
+    region: frankfurt
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+
+databases:
+  - name: events-db
+    plan: basic-256mb
+    region: frankfurt
+    postgresMajorVersion: "17"
+    diskSizeGB: 1
+    storageAutoscalingEnabled: false
+    ipAllowList: []

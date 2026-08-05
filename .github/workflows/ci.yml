@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.lock
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.lock ruff==0.16.1
+          python -m pip check
+      - name: Lint
+        run: ruff check apps config tests
+      - name: Check Django project
+        run: |
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+      - name: Test
+        run: python manage.py test
+      - name: Check production settings
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.production
+          SECRET_KEY: ci-only-secret-key-with-more-than-fifty-random-characters-93725184062
+          ALLOWED_HOSTS: events.example.com
+          CSRF_TRUSTED_ORIGINS: https://events.example.com
+          SECURE_SSL_REDIRECT: "True"
+          OBJECT_STORAGE_REQUIRED: "False"
+        run: python manage.py check --deploy
