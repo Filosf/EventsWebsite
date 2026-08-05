@@ -1,0 +1,14 @@
+{% load static %}
+<!doctype html>
+<html lang="{{ language|default:'ru' }}" dir="{{ dir|default:'ltr' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+  <title>{% block title %}Event{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  {% block content %}{% endblock %}
+</body>
+</html>

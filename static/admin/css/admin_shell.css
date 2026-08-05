@@ -1,0 +1,104 @@
+:root {
+  --workspace-accent: #236b4b;
+  --workspace-ink: #17231d;
+  --workspace-border: #d8dfdb;
+}
+
+#header {
+  align-items: center;
+  gap: 24px;
+}
+
+#branding {
+  flex: 0 0 auto;
+}
+
+#site-name a {
+  color: #fff;
+  font-weight: 700;
+}
+
+.admin-workspace-tabs {
+  align-self: stretch;
+  display: flex;
+  gap: 4px;
+  margin-inline-end: auto;
+}
+
+.admin-workspace-tabs a {
+  align-items: center;
+  border-bottom: 3px solid transparent;
+  color: rgba(255, 255, 255, 0.78);
+  display: flex;
+  padding: 0 13px;
+  text-decoration: none;
+}
+
+.admin-workspace-tabs a:hover,
+.admin-workspace-tabs a:focus,
+.admin-workspace-tabs a.is-active {
+  border-bottom-color: #8fd3ae;
+  color: #fff;
+}
+
+.admin-language-switcher {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 7px;
+}
+
+.admin-language-switcher label {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+}
+
+.admin-language-switcher select {
+  min-width: 96px;
+}
+
+.admin-language-switcher button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+  padding: 5px 8px;
+}
+
+.event-language-badge {
+  background: #e7f2ec;
+  border: 1px solid #c5ddcf;
+  border-radius: 4px;
+  color: #245e43;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+}
+
+@media (max-width: 900px) {
+  #header {
+    align-items: stretch;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding-bottom: 0;
+  }
+
+  .admin-workspace-tabs {
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    order: 2;
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .admin-language-switcher {
+    order: 3;
+    padding-bottom: 10px;
+  }
+
+  .admin-workspace-tabs a {
+    flex: 0 0 auto;
+  }
+}

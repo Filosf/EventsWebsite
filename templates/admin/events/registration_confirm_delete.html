@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/statistics.css' %}">
+{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+  <div class="response-delete-confirmation">
+    <h1>{{ stats_ui.delete_response }}: {{ registration.full_name }}</h1>
+    <p><strong>{{ stats_ui.delete_question }}</strong></p>
+    <p>{{ registration.full_name }} · {{ registration.email|default:registration.phone }}</p>
+    <p>{{ stats_ui.delete_warning }}</p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="page" value="{{ list_options.page }}">
+      <input type="hidden" name="status" value="{{ list_options.status }}">
+      <input type="hidden" name="sort" value="{{ list_options.sort }}">
+      <button type="submit" class="button delete-confirm-button">{{ stats_ui.confirm_delete }}</button>
+      <a class="button cancel-link" href="{% url 'event_admin:statistics' event_id=event.id %}?{{ return_query }}">{{ stats_ui.cancel }}</a>
+    </form>
+  </div>
+{% endblock %}

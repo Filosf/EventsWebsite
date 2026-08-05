@@ -1,0 +1,38 @@
+{% extends "admin/change_form.html" %}
+
+{% block content %}
+  {% if preview_languages %}
+    <section class="event-page-toolbar" aria-label="{{ admin_ui.event_pages }}">
+      <strong>{{ admin_ui.event_pages }}</strong>
+      <div class="event-public-links">
+        {% for language in preview_languages %}
+          <span class="event-public-link">
+            <a href="{{ language.url }}" target="_blank" rel="noopener">{{ language.short_label }}</a>
+            <button type="button" class="copy-link-button" data-copy-url="{{ language.url }}" data-copy-label="{{ admin_ui.copy_link }}" data-copied-label="{{ admin_ui.copied }}" title="{{ admin_ui.copy_link }}" aria-label="{{ admin_ui.copy_link }} {{ language.short_label }}"></button>
+          </span>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+  <div class="event-editor-layout{% if not preview_url %} without-preview{% endif %}">
+    <div class="event-editor-main">
+      {{ block.super }}
+    </div>
+    {% if preview_url %}
+      <aside class="event-preview" aria-label="{{ admin_ui.preview }}">
+        <header class="event-preview-header">
+          <strong>{{ admin_ui.preview }}</strong>
+          <a id="event-preview-open" href="{{ preview_url }}" target="_blank" rel="noopener">{{ admin_ui.open_separately }}</a>
+        </header>
+        <div class="event-preview-languages" aria-label="{{ admin_ui.preview_language }}">
+          {% for language in preview_languages %}
+            <button type="button" data-preview-language="{{ language.code }}" data-preview-url="{{ language.url }}"{% if language.url == preview_url %} class="is-active" aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ language.label }}</button>
+          {% endfor %}
+        </div>
+        <div id="event-preview-viewport">
+          <iframe id="event-preview-frame" src="{{ preview_url }}" title="{{ admin_ui.preview }}"></iframe>
+        </div>
+      </aside>
+    {% endif %}
+  </div>
+{% endblock %}

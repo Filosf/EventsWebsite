@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ admin_ui.site_title }}{% if title %} | {{ title }}{% endif %}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/admin_shell.css' %}">
+{% endblock %}
+
+{% block branding %}
+  <div id="site-name"><a href="{% url 'admin:events_event_changelist' %}">{{ admin_ui.site_title }}</a></div>
+{% endblock %}
+
+{% block nav-global %}
+  {% if admin_navigation_items %}
+    <nav class="admin-workspace-tabs" aria-label="{{ admin_ui.navigation }}">
+      {% for item in admin_navigation_items %}
+        <a href="{{ item.url }}"{% if item.key == admin_navigation_active %} class="is-active" aria-current="page"{% endif %}>{{ item.label }}</a>
+      {% endfor %}
+    </nav>
+  {% endif %}
+  <form class="admin-language-switcher" action="{% url 'set_language' %}" method="post">
+    {% csrf_token %}
+    <input name="next" type="hidden" value="{{ request.get_full_path }}">
+    <label for="admin-interface-language">{{ admin_ui.interface_language }}</label>
+    <select id="admin-interface-language" name="language" onchange="this.form.submit()">
+      <option value="ru"{% if admin_language == 'ru' %} selected{% endif %}>Русский</option>
+      <option value="en"{% if admin_language == 'en' %} selected{% endif %}>English</option>
+    </select>
+    <button type="submit">{{ admin_ui.switch_language }}</button>
+  </form>
+{% endblock %}

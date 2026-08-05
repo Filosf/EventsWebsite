@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block robots %}{% if event.is_search_engine_visible %}<meta name="robots" content="index,follow">{% else %}<meta name="robots" content="noindex,nofollow">{% endif %}{% endblock %}
+{% block title %}{{ translation.title }}{% endblock %}
+{% block content %}
+<main class="event-page" style="--primary: {{ event.theme_settings.primary_color }}; --secondary: {{ event.theme_settings.secondary_color }}; --bg: {{ event.theme_settings.background_color }}; --text: {{ event.theme_settings.text_color }}; --button: {{ event.theme_settings.button_color }}; --button-text: {{ event.theme_settings.button_text_color }}; --radius: {{ event.theme_settings.border_radius }}px;{% if event.theme_settings.background_image %} --background-image: url('{{ event.theme_settings.background_image.url }}');{% endif %}">
+  {% if translation.banner_image %}
+    <img class="event-banner" src="{{ translation.banner_image.url }}" alt="">
+  {% endif %}
+
+  <section class="event-shell">
+    <nav class="language-switcher" aria-label="Language">
+      {% for code, label in languages %}
+        <a href="{% url 'events:switch_language' slug=event.slug language=code %}" {% if code == language %}aria-current="page"{% endif %}>{{ label }}</a>
+      {% endfor %}
+    </nav>
+
+    <header class="event-header">
+      {% if event.theme_settings.logo_image %}<img class="event-logo" src="{{ event.theme_settings.logo_image.url }}" alt="">{% endif %}
+      <p class="event-date"><span dir="ltr">{{ event_starts_at|date:"d.m.Y H:i" }} · {{ event.timezone }}</span></p>
+      <h1>{{ translation.title }}</h1>
+      {% if translation.subtitle %}<p class="subtitle">{{ translation.subtitle }}</p>{% endif %}
+    </header>
+
+    <section class="event-details">
+      {% if translation.description %}<div>{{ translation.description|linebreaks }}</div>{% endif %}
+      {% if translation.location_name or translation.location_address %}
+        <address>
+          <strong>{{ translation.location_name }}</strong><br>
+          {{ translation.location_address }}
+        </address>
+        {% if translation.location_description %}<p>{{ translation.location_description }}</p>{% endif %}
+      {% endif %}
+      {% if translation.additional_information %}<div>{{ translation.additional_information|linebreaks }}</div>{% endif %}
+    </section>
+
+    <section class="rsvp-panel">
+      {% if event.accepts_registrations %}
+        <h2>{{ ui.rsvp }}</h2>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+          {{ form.non_field_errors }}
+          {% for field in form.visible_fields %}
+            <div class="field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {{ field.errors }}
+            </div>
+          {% endfor %}
+          <button type="submit">{{ ui.submit }}</button>
+        </form>
+      {% else %}
+        <div class="closed-message">
+          {{ translation.registration_closed_message|default:ui.closed }}
+        </div>
+      {% endif %}
+    </section>
+  </section>
+</main>
+{% endblock %}

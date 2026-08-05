@@ -1,0 +1,192 @@
+.statistics-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.statistics-heading h1 {
+  margin-bottom: 5px;
+}
+
+.statistics-summary {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  margin: 0 0 28px;
+}
+
+.statistics-summary > div {
+  background: var(--darkened-bg, #f7f7f7);
+  border: 1px solid var(--hairline-color, #e8e8e8);
+  min-width: 0;
+  padding: 12px;
+}
+
+.statistics-summary dt {
+  color: var(--body-quiet-color, #666);
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.statistics-summary dt small {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.25;
+  margin-top: 3px;
+}
+
+.statistics-summary dd {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.responses-toolbar {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.responses-toolbar h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.responses-toolbar h2 span {
+  color: var(--body-quiet-color, #666);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.responses-filter-form {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.responses-filter-form label {
+  font-size: 12px;
+  margin-inline-start: 5px;
+}
+
+.responses-filter-form select {
+  min-width: 160px;
+}
+
+.statistics-table-wrap {
+  overflow-x: auto;
+}
+
+.responses-table {
+  min-width: 920px;
+  width: 100%;
+}
+
+.responses-table th,
+.responses-table td {
+  padding: 9px 10px;
+  text-align: start;
+  vertical-align: top;
+}
+
+.responses-table tbody tr:nth-child(even) {
+  background: var(--darkened-bg, #f7f7f7);
+}
+
+.response-comment {
+  max-width: 260px;
+  white-space: normal;
+}
+
+.response-actions {
+  white-space: nowrap;
+}
+
+.response-actions a + a {
+  margin-inline-start: 12px;
+}
+
+.delete-link {
+  color: var(--delete-button-bg, #ba2121);
+}
+
+.statistics-pagination {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  padding: 18px 0 4px;
+}
+
+.response-edit-form {
+  max-width: 820px;
+}
+
+.response-edit-form textarea {
+  max-width: 640px;
+}
+
+.cancel-link {
+  display: inline-block;
+  margin: 0 8px;
+  vertical-align: middle;
+}
+
+.response-delete-confirmation {
+  max-width: 720px;
+}
+
+.response-delete-confirmation form {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.delete-confirm-button {
+  background: var(--delete-button-bg, #ba2121);
+  border: 0;
+  color: var(--button-fg, #fff);
+}
+
+@media (max-width: 1100px) {
+  .statistics-summary {
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .statistics-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .statistics-heading > .button {
+    align-self: flex-start;
+  }
+
+  .statistics-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .responses-toolbar,
+  .responses-filter-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .responses-filter-form label {
+    margin: 0;
+  }
+
+  .responses-filter-form .button {
+    align-self: flex-start;
+  }
+}

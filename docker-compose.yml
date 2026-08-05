@@ -1,0 +1,136 @@
+name: wedding-events
+
+services:
+  web:
+    build: .
+    command: sh -c "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --access-logfile -"
+    restart: unless-stopped
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY before starting Docker Compose}
+      SECURE_SSL_REDIRECT: ${SECURE_SSL_REDIRECT:-False}
+      DATABASE_URL: postgres://${POSTGRES_USER:-events}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-events}
+      REDIS_URL: redis://redis:6379/1
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-127.0.0.1},localhost,web
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
+      TRUST_X_FORWARDED_FOR: "True"
+      SITE_ADDRESS: ${SITE_ADDRESS:-http://localhost}
+    expose:
+      - "8000"
+    volumes:
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz/', timeout=3).read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 20s
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-http://localhost}
+    ports:
+      - "${HTTP_PORT:-8000}:80"
+      - "${HTTPS_PORT:-8443}:443"
+      - "${HTTPS_PORT:-8443}:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - media:/app/media:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-events}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-events}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backup:
+    image: postgres:17-alpine
+    profiles: ["tools"]
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER:-events}
+      POSTGRES_DB: ${POSTGRES_DB:-events}
+      BACKUP_NAME: ${BACKUP_NAME:-}
+    volumes:
+      - ./backups:/backups
+      - media:/media:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        test -n "$$BACKUP_NAME"
+        umask 077
+        pg_dump -h db -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -Fc -f "/backups/$$BACKUP_NAME-db.dump"
+        tar -czf "/backups/$$BACKUP_NAME-media.tar.gz" -C /media .
+        cd /backups
+        sha256sum "$$BACKUP_NAME-db.dump" "$$BACKUP_NAME-media.tar.gz" > "$$BACKUP_NAME.sha256"
+
+  restore:
+    image: postgres:17-alpine
+    profiles: ["tools"]
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER:-events}
+      POSTGRES_DB: ${POSTGRES_DB:-events}
+      BACKUP_NAME: ${BACKUP_NAME:-}
+      RESTORE_CONFIRM: ${RESTORE_CONFIRM:-NO}
+    volumes:
+      - ./backups:/backups:ro
+      - media:/media
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        test "$$RESTORE_CONFIRM" = "YES"
+        test -n "$$BACKUP_NAME"
+        test -f "/backups/$$BACKUP_NAME-db.dump"
+        test -f "/backups/$$BACKUP_NAME-media.tar.gz"
+        cd /backups && sha256sum -c "$$BACKUP_NAME.sha256"
+        pg_restore -h db -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" --clean --if-exists --no-owner --exit-on-error "/backups/$$BACKUP_NAME-db.dump"
+        find /media -mindepth 1 -delete
+        tar -xzf "/backups/$$BACKUP_NAME-media.tar.gz" -C /media
+        chown -R 10001:10001 /media
+
+volumes:
+  postgres_data:
+  redis_data:
+  media:
+  caddy_data:
+  caddy_config:

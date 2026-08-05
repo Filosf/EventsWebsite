@@ -1,0 +1,92 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/statistics.css' %}">
+{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+  <div class="statistics-heading">
+    <div>
+      <h1>{{ stats_ui.title }}: {{ event.internal_name }}</h1>
+      <a href="{% url 'admin:events_event_change' event.id %}">{{ stats_ui.back_to_event }}</a>
+    </div>
+    <a class="button" href="{% url 'event_admin:registrations_export' event_id=event.id %}?{{ list_query }}">{{ stats_ui.export_csv }}</a>
+  </div>
+
+  <dl class="statistics-summary">
+    <div><dt>{{ stats_ui.registrations }}</dt><dd>{{ stats.registrations_total }}</dd></div>
+    <div><dt>{{ stats_ui.attending }}</dt><dd>{{ stats.attending_total }}</dd></div>
+    <div><dt>{{ stats_ui.declined }}</dt><dd>{{ stats.declined_total }}</dd></div>
+    <div><dt>{{ stats_ui.expected_guests }}<small>{{ stats_ui.expected_guests_hint }}</small></dt><dd>{{ stats.expected_guests }}</dd></div>
+    <div><dt>{{ stats_ui.page_views }}</dt><dd>{{ stats.page_views }}</dd></div>
+    <div><dt>{{ stats_ui.unique_visitors }}</dt><dd>{{ stats.unique_visitors }}</dd></div>
+  </dl>
+
+  <section class="responses-section">
+    <div class="responses-toolbar">
+      <h2>{{ stats_ui.guest_responses }} <span>({{ filtered_total }} {{ stats_ui.shown }})</span></h2>
+      <form method="get" class="responses-filter-form">
+        <label for="response-status-filter">{{ stats_ui.filter_label }}</label>
+        <select id="response-status-filter" name="status">
+          {% for value, label in status_options %}<option value="{{ value }}"{% if value == selected_status %} selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+        <label for="response-sort">{{ stats_ui.sort_label }}</label>
+        <select id="response-sort" name="sort">
+          {% for value, label in sort_options %}<option value="{{ value }}"{% if value == selected_sort %} selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="button">{{ stats_ui.apply }}</button>
+      </form>
+    </div>
+    <div class="statistics-table-wrap">
+      <table class="responses-table">
+        <thead>
+          <tr>
+            <th>{{ stats_ui.guest }}</th>
+            <th>{{ stats_ui.response }}</th>
+            <th>{{ stats_ui.guests }}</th>
+            <th>{{ stats_ui.contact }}</th>
+            <th>{{ stats_ui.comment }}</th>
+            <th>{{ stats_ui.submitted }}</th>
+            {% if can_manage_responses %}<th>{{ stats_ui.actions }}</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for registration in page_obj %}
+            <tr>
+              <td><strong>{{ registration.full_name }}</strong></td>
+              <td>{{ registration.localized_attendance }}</td>
+              <td>{{ registration.guest_count }}</td>
+              <td>
+                {% if registration.email %}<a href="mailto:{{ registration.email }}">{{ registration.email }}</a>{% endif %}
+                {% if registration.email and registration.phone %}<br>{% endif %}
+                {% if registration.phone %}<a href="tel:{{ registration.phone }}">{{ registration.phone }}</a>{% endif %}
+              </td>
+              <td class="response-comment">{{ registration.comment|default:"-" }}</td>
+              <td>{{ registration.created_at|date:"SHORT_DATETIME_FORMAT" }}</td>
+              {% if can_manage_responses %}
+                <td class="response-actions">
+                  <a href="{% url 'event_admin:registration_edit' event_id=event.id registration_id=registration.id %}?{{ return_query }}">{{ stats_ui.edit }}</a>
+                  <a class="delete-link" href="{% url 'event_admin:registration_delete' event_id=event.id registration_id=registration.id %}?{{ return_query }}">{{ stats_ui.delete }}</a>
+                </td>
+              {% endif %}
+            </tr>
+          {% empty %}
+            <tr><td colspan="{% if can_manage_responses %}7{% else %}6{% endif %}">{{ stats_ui.empty }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="statistics-pagination" aria-label="{{ stats_ui.page }}">
+        {% if page_obj.has_previous %}<a href="?{{ list_query }}&amp;page={{ page_obj.previous_page_number }}">{{ stats_ui.previous }}</a>{% endif %}
+        <span>{{ stats_ui.page }} {{ page_obj.number }} {{ stats_ui.of }} {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?{{ list_query }}&amp;page={{ page_obj.next_page_number }}">{{ stats_ui.next }}</a>{% endif %}
+      </nav>
+    {% endif %}
+  </section>
+{% endblock %}

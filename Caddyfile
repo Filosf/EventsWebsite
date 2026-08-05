@@ -1,0 +1,23 @@
+{$SITE_ADDRESS:http://localhost} {
+    encode zstd gzip
+
+    @media path /media/*
+    handle @media {
+        root * /app
+        file_server
+        header Cache-Control "public, max-age=604800"
+        header X-Content-Type-Options "nosniff"
+    }
+
+    handle {
+        reverse_proxy web:8000
+    }
+
+    header {
+        -Server
+        Referrer-Policy "strict-origin-when-cross-origin"
+        X-Content-Type-Options "nosniff"
+    }
+
+    log
+}

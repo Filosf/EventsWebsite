@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/statistics.css' %}">
+{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+  <h1>{{ stats_ui.edit_response }}: {{ registration.full_name }}</h1>
+  <form method="post" class="response-edit-form">
+    {% csrf_token %}
+    <input type="hidden" name="page" value="{{ list_options.page }}">
+    <input type="hidden" name="status" value="{{ list_options.status }}">
+    <input type="hidden" name="sort" value="{{ list_options.sort }}">
+    {{ form.non_field_errors }}
+    <fieldset class="module aligned">
+      {% for field in form %}
+        <div class="form-row field-{{ field.name }}">
+          <div class="flex-container">
+            {{ field.label_tag }}
+            {{ field }}
+          </div>
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+    </fieldset>
+    <div class="submit-row">
+      <input type="submit" value="{{ stats_ui.save }}" class="default">
+      <a class="button cancel-link" href="{% url 'event_admin:statistics' event_id=event.id %}?{{ return_query }}">{{ stats_ui.cancel }}</a>
+    </div>
+  </form>
+{% endblock %}

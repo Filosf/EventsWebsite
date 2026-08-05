@@ -1,0 +1,14 @@
+target-version = "py312"
+
+[lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "BLE", "S", "SIM", "UP", "RUF"]
+ignore = [
+    "RUF001", # Russian and Hebrew interface text intentionally uses non-ASCII scripts.
+    "RUF012", # Django model, form, and admin classes use mutable declarative attributes.
+]
+
+[lint.per-file-ignores]
+"apps/accounts/management/commands/release_preflight.py" = ["S105"]
+"config/settings/development.py" = ["S104"]
+"config/settings/production.py" = ["S105"]
+"tests/*" = ["S101", "S106"]

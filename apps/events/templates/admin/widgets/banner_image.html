@@ -1,0 +1,18 @@
+<div class="admin-banner-widget">
+  {% if widget.is_initial %}
+    <div class="admin-banner-current">
+      <span>{{ widget.initial_text }}:</span>
+      <a href="{{ widget.value.url }}" target="_blank" rel="noopener" title="{{ widget.value }}">{{ widget.value }}</a>
+      {% if not widget.required %}
+        <label class="admin-banner-clear" for="{{ widget.checkbox_id }}">
+          <input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}>
+          {{ widget.clear_checkbox_label }}
+        </label>
+      {% endif %}
+    </div>
+  {% endif %}
+  <div class="admin-banner-change">
+    {% if widget.is_initial %}<span>{{ widget.input_text }}:</span>{% endif %}
+    <input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+  </div>
+</div>

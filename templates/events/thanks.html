@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ translation.title }}{% endblock %}
+{% block content %}
+<main class="event-page">
+  <section class="event-shell thanks">
+    <h1>{{ message|default:ui.thank_you }}</h1>
+    <a class="button-link" href="{% url 'events:event_page_language' language=language slug=event.slug %}">{{ ui.back }}</a>
+  </section>
+</main>
+{% endblock %}
